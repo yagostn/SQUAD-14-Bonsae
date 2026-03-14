@@ -42,42 +42,34 @@ import {
   Trash2,
   Eye,
 } from "lucide-react"
-import type { Cliente } from "@/lib/types"
-
-const clientesIniciais: Cliente[] = [
-  {
-    id: "1",
-    nome: "João Silva",
-    email: "joao@empresa.com",
-    empresa: "Empresa ABC Ltda",
-    created_at: "2024-01-15T10:00:00Z",
-  },
-  {
-    id: "2",
-    nome: "Maria Santos",
-    email: "maria@instituto.org",
-    empresa: "Instituto XYZ",
-    created_at: "2024-02-10T14:30:00Z",
-  },
-  {
-    id: "3",
-    nome: "Carlos Oliveira",
-    email: "carlos@fundacao.org.br",
-    empresa: "Fundação Esperança",
-    created_at: "2024-02-20T09:15:00Z",
-  },
-]
+import { useStore } from "@/components/store-provider"
+import { toast } from "sonner"
 
 export default function ClientesPage() {
+  const { clientes, addCliente, isLoading } = useStore()
   const [searchQuery, setSearchQuery] = useState("")
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [newCliente, setNewCliente] = useState({ nome: "", email: "", empresa: "" })
 
-  const filteredClientes = clientesIniciais.filter(
+  if (isLoading) return null
+
+  const filteredClientes = clientes.filter(
     (c) =>
       c.nome.toLowerCase().includes(searchQuery.toLowerCase()) ||
       c.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
       c.empresa.toLowerCase().includes(searchQuery.toLowerCase())
   )
+
+  const handleCreateCliente = () => {
+    if (!newCliente.nome || !newCliente.email) {
+      toast.error("Nome e E-mail são obrigatórios.")
+      return
+    }
+    addCliente(newCliente)
+    toast.success("Cliente cadastrado com sucesso!")
+    setIsDialogOpen(false)
+    setNewCliente({ nome: "", email: "", empresa: "" })
+  }
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("pt-BR", {
@@ -121,22 +113,22 @@ export default function ClientesPage() {
               <div className="space-y-4 py-4">
                 <div className="space-y-2">
                   <Label htmlFor="nome">Nome</Label>
-                  <Input id="nome" placeholder="Nome do responsável" />
+                  <Input id="nome" placeholder="Nome do responsável" value={newCliente.nome} onChange={(e) => setNewCliente({ ...newCliente, nome: e.target.value })} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="email">E-mail</Label>
-                  <Input id="email" type="email" placeholder="email@empresa.com" />
+                  <Input id="email" type="email" placeholder="email@empresa.com" value={newCliente.email} onChange={(e) => setNewCliente({ ...newCliente, email: e.target.value })} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="empresa">Empresa/Instituição</Label>
-                  <Input id="empresa" placeholder="Nome da empresa" />
+                  <Input id="empresa" placeholder="Nome da empresa" value={newCliente.empresa} onChange={(e) => setNewCliente({ ...newCliente, empresa: e.target.value })} />
                 </div>
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
                   Cancelar
                 </Button>
-                <Button onClick={() => setIsDialogOpen(false)}>
+                <Button onClick={handleCreateCliente}>
                   Cadastrar Cliente
                 </Button>
               </DialogFooter>
@@ -153,7 +145,7 @@ export default function ClientesPage() {
                   <Users className="h-6 w-6 text-primary" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold">{clientesIniciais.length}</p>
+                  <p className="text-2xl font-bold">{clientes.length}</p>
                   <p className="text-sm text-muted-foreground">Total de clientes</p>
                 </div>
               </div>
@@ -166,7 +158,7 @@ export default function ClientesPage() {
                   <Building className="h-6 w-6 text-green-600" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold">{clientesIniciais.length}</p>
+                  <p className="text-2xl font-bold">{clientes.length}</p>
                   <p className="text-sm text-muted-foreground">Empresas ativas</p>
                 </div>
               </div>

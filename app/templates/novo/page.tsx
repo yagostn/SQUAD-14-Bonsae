@@ -31,8 +31,12 @@ const categorias = [
   "Outros",
 ]
 
+import { useStore } from "@/components/store-provider"
+import { toast } from "sonner"
+
 export default function NovoTemplatePage() {
   const router = useRouter()
+  const { addTemplate } = useStore()
   const editorRef = useRef<{ insertVariable: (v: string) => void }>(null)
   const [nomeTemplate, setNomeTemplate] = useState("")
   const [categoria, setCategoria] = useState("")
@@ -63,19 +67,31 @@ export default function NovoTemplatePage() {
 
   const handleSave = async () => {
     if (!nomeTemplate.trim()) {
-      alert("Por favor, informe o nome do template.")
+      toast.error("Por favor, informe o nome do template.")
       return
     }
     if (!conteudo.trim()) {
-      alert("Por favor, adicione conteúdo ao template.")
+      toast.error("Por favor, adicione conteúdo ao template.")
       return
     }
 
     setIsSaving(true)
-    // Simulate save
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    setIsSaving(false)
-    router.push("/templates")
+    try {
+      addTemplate({
+        nome_template: nomeTemplate,
+        categoria: categoria || "Outros",
+        conteudo: conteudo,
+        cliente_id: "1", // Mock client
+        imagem_fundo: letterhead || undefined,
+      })
+      
+      toast.success("Template salvo com sucesso!")
+      router.push("/templates")
+    } catch (error) {
+      toast.error("Erro ao salvar template.")
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   return (

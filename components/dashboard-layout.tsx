@@ -1,7 +1,10 @@
 "use client"
 
-import { Sidebar } from "@/components/sidebar"
+import { useState, useEffect } from "react"
+import { usePathname } from "next/navigation"
+import { Sidebar, SidebarContent } from "@/components/sidebar"
 import { Header } from "@/components/header"
+import { Sheet, SheetContent } from "@/components/ui/sheet"
 
 interface DashboardLayoutProps {
   children: React.ReactNode
@@ -10,12 +13,32 @@ interface DashboardLayoutProps {
 }
 
 export function DashboardLayout({ children, title, subtitle }: DashboardLayoutProps) {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const pathname = usePathname()
+
+  // Close mobile menu when route changes
+  useEffect(() => {
+    setIsMobileMenuOpen(false)
+  }, [pathname])
+
   return (
-    <div className="flex h-screen bg-background">
+    <div className="flex h-screen bg-background overflow-hidden">
       <Sidebar />
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <Header title={title} subtitle={subtitle} />
-        <main className="flex-1 overflow-y-auto p-6">
+      
+      {/* Mobile Sidebar */}
+      <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+        <SheetContent side="left" className="p-0 border-r-0 w-64 bg-sidebar">
+          <SidebarContent />
+        </SheetContent>
+      </Sheet>
+
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <Header 
+          title={title} 
+          subtitle={subtitle} 
+          onMenuClick={() => setIsMobileMenuOpen(true)}
+        />
+        <main className="flex-1 overflow-y-auto p-4 md:p-6">
           {children}
         </main>
       </div>

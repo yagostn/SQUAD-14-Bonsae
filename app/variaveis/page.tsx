@@ -26,14 +26,19 @@ import {
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Search, Plus, Variable, Copy, Check } from "lucide-react"
-import { variaveisDisponiveis } from "@/lib/store"
+import { useStore } from "@/components/store-provider"
+import { toast } from "sonner"
 
 export default function VariaveisPage() {
+  const { variaveis, addVariavel, isLoading } = useStore()
   const [searchQuery, setSearchQuery] = useState("")
   const [copiedId, setCopiedId] = useState<string | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [newVar, setNewVar] = useState({ nome_variavel: "", descricao: "", exemplo: "" })
 
-  const filteredVariaveis = variaveisDisponiveis.filter(
+  if (isLoading) return null
+
+  const filteredVariaveis = variaveis.filter(
     (v) =>
       v.nome_variavel.toLowerCase().includes(searchQuery.toLowerCase()) ||
       v.descricao.toLowerCase().includes(searchQuery.toLowerCase())
@@ -43,6 +48,18 @@ export default function VariaveisPage() {
     navigator.clipboard.writeText(`{{${variavel}}}`)
     setCopiedId(id)
     setTimeout(() => setCopiedId(null), 2000)
+    toast.success("Copiado para a área de transferência!")
+  }
+
+  const handleCreateVar = () => {
+    if (!newVar.nome_variavel) {
+      toast.error("O nome da variável é obrigatório.")
+      return
+    }
+    addVariavel(newVar)
+    toast.success("Variável criada com sucesso!")
+    setIsDialogOpen(false)
+    setNewVar({ nome_variavel: "", descricao: "", exemplo: "" })
   }
 
   return (
@@ -82,6 +99,8 @@ export default function VariaveisPage() {
                   <Input
                     id="nome_variavel"
                     placeholder="Ex: numero_processo"
+                    value={newVar.nome_variavel}
+                    onChange={(e) => setNewVar({ ...newVar, nome_variavel: e.target.value })}
                   />
                   <p className="text-xs text-muted-foreground">
                     Use apenas letras minúsculas e underscores
@@ -92,6 +111,8 @@ export default function VariaveisPage() {
                   <Textarea
                     id="descricao"
                     placeholder="Descreva para que serve esta variável"
+                    value={newVar.descricao}
+                    onChange={(e) => setNewVar({ ...newVar, descricao: e.target.value })}
                   />
                 </div>
                 <div className="space-y-2">
@@ -99,6 +120,8 @@ export default function VariaveisPage() {
                   <Input
                     id="exemplo"
                     placeholder="Ex: 1234/2024"
+                    value={newVar.exemplo}
+                    onChange={(e) => setNewVar({ ...newVar, exemplo: e.target.value })}
                   />
                 </div>
               </div>
@@ -106,7 +129,7 @@ export default function VariaveisPage() {
                 <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
                   Cancelar
                 </Button>
-                <Button onClick={() => setIsDialogOpen(false)}>
+                <Button onClick={handleCreateVar}>
                   Criar Variável
                 </Button>
               </DialogFooter>

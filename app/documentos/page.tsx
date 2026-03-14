@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -31,7 +32,8 @@ import {
   Calendar,
   Filter,
 } from "lucide-react"
-import { documentosIniciais, templatesIniciais } from "@/lib/store"
+import { useStore } from "@/components/store-provider"
+import { toast } from "sonner"
 import {
   Select,
   SelectContent,
@@ -41,10 +43,13 @@ import {
 } from "@/components/ui/select"
 
 export default function DocumentosPage() {
+  const { documentos, templates, deleteDocumento, isLoading } = useStore()
   const [searchQuery, setSearchQuery] = useState("")
   const [templateFilter, setTemplateFilter] = useState("all")
 
-  const filteredDocumentos = documentosIniciais.filter((doc) => {
+  if (isLoading) return null
+
+  const filteredDocumentos = documentos.filter((doc) => {
     const matchesSearch = doc.nome
       .toLowerCase()
       .includes(searchQuery.toLowerCase())
@@ -54,8 +59,15 @@ export default function DocumentosPage() {
   })
 
   const getTemplateName = (templateId: string) => {
-    const template = templatesIniciais.find((t) => t.id === templateId)
+    const template = templates.find((t) => t.id === templateId)
     return template?.nome_template || "Template desconhecido"
+  }
+
+  const handleDelete = (id: string) => {
+    if (confirm("Tem certeza que deseja excluir este documento?")) {
+      deleteDocumento(id)
+      toast.success("Documento excluído com sucesso!")
+    }
   }
 
   const formatDate = (dateString: string) => {
@@ -92,7 +104,7 @@ export default function DocumentosPage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos os templates</SelectItem>
-              {templatesIniciais.map((t) => (
+              {templates.map((t) => (
                 <SelectItem key={t.id} value={t.id}>
                   {t.nome_template}
                 </SelectItem>
@@ -110,7 +122,7 @@ export default function DocumentosPage() {
                   <FileText className="h-6 w-6 text-primary" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold">{documentosIniciais.length}</p>
+                  <p className="text-2xl font-bold">{documentos.length}</p>
                   <p className="text-sm text-muted-foreground">Total de documentos</p>
                 </div>
               </div>
@@ -124,7 +136,7 @@ export default function DocumentosPage() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold">
-                    {documentosIniciais.filter((d) => d.pdf_gerado).length}
+                    {documentos.filter((d) => d.pdf_gerado).length}
                   </p>
                   <p className="text-sm text-muted-foreground">PDFs exportados</p>
                 </div>
@@ -140,7 +152,7 @@ export default function DocumentosPage() {
                 <div>
                   <p className="text-2xl font-bold">
                     {
-                      documentosIniciais.filter((d) => {
+                      documentos.filter((d) => {
                         const docDate = new Date(d.created_at)
                         const now = new Date()
                         return (
@@ -205,16 +217,20 @@ export default function DocumentosPage() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem>
-                            <Eye className="h-4 w-4 mr-2" />
-                            Visualizar
+                          <DropdownMenuItem asChild>
+                            <Link href={`/documentos/${doc.id}`}>
+                              <Eye className="h-4 w-4 mr-2" />
+                              Visualizar
+                            </Link>
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <Download className="h-4 w-4 mr-2" />
-                            Baixar PDF
+                          <DropdownMenuItem asChild>
+                            <Link href={`/documentos/${doc.id}?print=true`}>
+                              <Download className="h-4 w-4 mr-2" />
+                              Baixar PDF
+                            </Link>
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem className="text-destructive">
+                          <DropdownMenuItem className="text-destructive" onClick={() => handleDelete(doc.id)}>
                             <Trash2 className="h-4 w-4 mr-2" />
                             Excluir
                           </DropdownMenuItem>

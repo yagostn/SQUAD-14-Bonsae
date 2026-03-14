@@ -7,10 +7,14 @@ import { TemplateList } from "@/components/template-list"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { FileText, FolderOpen, Users, TrendingUp, Plus, ArrowRight } from "lucide-react"
-import { templatesIniciais, documentosIniciais } from "@/lib/store"
+import { useStore } from "@/components/store-provider"
 import Link from "next/link"
 
 export default function DashboardPage() {
+  const { templates, documentos, isLoading } = useStore()
+
+  if (isLoading) return null
+
   return (
     <DashboardLayout 
       title="Dashboard" 
@@ -37,15 +41,15 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatsCard
             title="Templates Ativos"
-            value={templatesIniciais.length}
+            value={templates.length}
             description="Templates disponíveis"
             icon={FileText}
             trend={{ value: 12, positive: true }}
           />
           <StatsCard
             title="Documentos Gerados"
-            value={documentosIniciais.length}
-            description="Este mês"
+            value={documentos.length}
+            description="Total gerados"
             icon={FolderOpen}
             trend={{ value: 8, positive: true }}
           />
@@ -68,10 +72,10 @@ export default function DashboardPage() {
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
-            <RecentDocuments documentos={documentosIniciais} />
+            <RecentDocuments documentos={documentos} />
           </div>
           <div>
-            <TemplateList templates={templatesIniciais} compact />
+            <TemplateList templates={templates} compact />
           </div>
         </div>
 
@@ -83,10 +87,9 @@ export default function DashboardPage() {
           <CardContent>
             <div className="space-y-4">
               {[
-                { action: "Template criado", item: "Declaração de Residência", time: "Há 2 horas" },
-                { action: "Documento gerado", item: "Comprovante - Maria Santos", time: "Há 5 horas" },
-                { action: "Template editado", item: "Autorização de Uso de Dados", time: "Há 1 dia" },
-                { action: "Novo cliente", item: "Empresa ABC", time: "Há 2 dias" },
+                { action: "Template criado", item: templates[templates.length - 1]?.nome_template || "Nenhum", time: "Recentemente" },
+                { action: "Documento gerado", item: documentos[documentos.length - 1]?.nome || "Nenhum", time: "Recentemente" },
+                { action: "Sessão iniciada", item: "Usuário Demo", time: "Agora" },
               ].map((activity, index) => (
                 <div
                   key={index}

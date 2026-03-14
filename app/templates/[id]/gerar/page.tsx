@@ -9,12 +9,15 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowLeft, FileDown, Eye, Save, Printer } from "lucide-react"
 import Link from "next/link"
-import { templatesIniciais, extrairVariaveis, variaveisDisponiveis, substituirVariaveis } from "@/lib/store"
+import { useStore } from "@/components/store-provider"
+import { toast } from "sonner"
+import { extrairVariaveis, substituirVariaveis } from "@/lib/store"
 import type { Template } from "@/lib/types"
 
 export default function GerarDocumentoPage() {
   const params = useParams()
   const router = useRouter()
+  const { templates, variaveis: variaveisStore, addDocumento, isLoading } = useStore()
   const previewRef = useRef<HTMLDivElement>(null)
   const [template, setTemplate] = useState<Template | null>(null)
   const [dados, setDados] = useState<Record<string, string>>({})
@@ -22,8 +25,10 @@ export default function GerarDocumentoPage() {
   const [isGenerating, setIsGenerating] = useState(false)
 
   useEffect(() => {
+    if (isLoading) return
+
     const templateId = params.id as string
-    const foundTemplate = templatesIniciais.find((t) => t.id === templateId)
+    const foundTemplate = templates.find((t) => t.id === templateId)
     if (foundTemplate) {
       setTemplate(foundTemplate)
       const extractedVars = extrairVariaveis(foundTemplate.conteudo)
@@ -35,10 +40,10 @@ export default function GerarDocumentoPage() {
       }
       setDados(initialData)
     }
-  }, [params.id])
+  }, [params.id, templates, isLoading])
 
   const getVariableInfo = (varName: string) => {
-    return variaveisDisponiveis.find((v) => v.nome_variavel === varName)
+    return variaveisStore.find((v) => v.nome_variavel === varName)
   }
 
   const handleInputChange = (varName: string, value: string) => {
@@ -46,67 +51,83 @@ export default function GerarDocumentoPage() {
   }
 
   const handleGeneratePDF = async () => {
+    if (!template) return
+    
     setIsGenerating(true)
     
-    // Use browser print functionality
-    if (previewRef.current) {
-      const printContent = previewRef.current.innerHTML
-      const printWindow = window.open("", "_blank")
-      
-      if (printWindow) {
-        printWindow.document.write(`
-          <!DOCTYPE html>
-          <html>
-          <head>
-            <title>${template?.nome_template || "Documento"}</title>
-            <style>
-              @page {
-                size: A4;
-                margin: 20mm;
-              }
-              body {
-                font-family: "Times New Roman", serif;
-                font-size: 12pt;
-                line-height: 1.6;
-                color: #000;
-                margin: 0;
-                padding: 0;
-              }
-              h1, h2, h3 {
-                margin-top: 0;
-              }
-              .document-content {
-                max-width: 170mm;
-                margin: 0 auto;
-              }
-              @media print {
+    try {
+      // Create document in store
+      addDocumento({
+        template_id: template.id,
+        nome: `${template.nome_template} - ${dados.nome || "Novo Documento"}`,
+        dados_json: dados,
+      })
+
+      // Use browser print functionality
+      if (previewRef.current) {
+        const printContent = previewRef.current.innerHTML
+        const printWindow = window.open("", "_blank")
+        
+        if (printWindow) {
+          printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+              <title>${template?.nome_template || "Documento"}</title>
+              <style>
+                @page {
+                  size: A4;
+                  margin: 20mm;
+                }
                 body {
-                  print-color-adjust: exact;
-                  -webkit-print-color-adjust: exact;
+                  font-family: "Times New Roman", serif;
+                  font-size: 12pt;
+                  line-height: 1.6;
+                  color: #000;
+                  margin: 0;
+                  padding: 0;
                 }
-              }
-            </style>
-          </head>
-          <body>
-            <div class="document-content">
-              ${printContent}
-            </div>
-            <script>
-              window.onload = function() {
-                window.print();
-                window.onafterprint = function() {
-                  window.close();
+                h1, h2, h3 {
+                  margin-top: 0;
                 }
-              }
-            </script>
-          </body>
-          </html>
-        `)
-        printWindow.document.close()
+                .document-content {
+                  max-width: 170mm;
+                  margin: 0 auto;
+                }
+                @media print {
+                  body {
+                    print-color-adjust: exact;
+                    -webkit-print-color-adjust: exact;
+                  }
+                }
+              </style>
+            </head>
+            <body>
+              <div class="document-content">
+                ${printContent}
+              </div>
+              <script>
+                window.onload = function() {
+                  window.print();
+                  window.onafterprint = function() {
+                    window.close();
+                  }
+                }
+              </script>
+            </body>
+            </html>
+          `)
+          printWindow.document.close()
+        }
       }
+      
+      toast.success("Documento gerado e salvo com sucesso!")
+      router.push("/documentos")
+    } catch (error) {
+      toast.error("Erro ao gerar documento.")
+    } finally {
+      setIsGenerating(false)
     }
-    
-    setTimeout(() => setIsGenerating(false), 1000)
   }
 
   const processedContent = template

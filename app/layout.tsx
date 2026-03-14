@@ -18,16 +18,30 @@ export const metadata: Metadata = {
   generator: 'Bonsae',
 }
 
+import { StoreProvider } from '@/components/store-provider'
+import { ThemeProvider } from '@/components/theme-provider'
+import { Toaster } from 'sonner'
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" suppressHydrationWarning>
       <body className={`${inter.variable} ${geistMono.variable} font-sans antialiased`}>
-        {children}
-        <Analytics />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <StoreProvider>
+            {children}
+          </StoreProvider>
+          <Toaster position="top-right" />
+          <Analytics />
+        </ThemeProvider>
       </body>
     </html>
   )

@@ -13,18 +13,21 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Plus, Search, Filter } from "lucide-react"
-import { templatesIniciais } from "@/lib/store"
+import { useStore } from "@/components/store-provider"
 import Link from "next/link"
 
 export default function TemplatesPage() {
+  const { templates, isLoading } = useStore()
   const [searchQuery, setSearchQuery] = useState("")
   const [categoryFilter, setCategoryFilter] = useState("all")
 
+  if (isLoading) return null
+
   const categorias = Array.from(
-    new Set(templatesIniciais.map((t) => t.categoria).filter(Boolean))
+    new Set(templates.map((t) => t.categoria).filter(Boolean))
   )
 
-  const filteredTemplates = templatesIniciais.filter((template) => {
+  const filteredTemplates = templates.filter((template) => {
     const matchesSearch = template.nome_template
       .toLowerCase()
       .includes(searchQuery.toLowerCase())

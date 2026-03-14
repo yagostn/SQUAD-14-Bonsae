@@ -10,16 +10,20 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import type { Documento } from "@/lib/types"
-import { templatesIniciais } from "@/lib/store"
 import Link from "next/link"
+import { useStore } from "@/components/store-provider"
 
 interface RecentDocumentsProps {
   documentos: Documento[]
 }
 
 export function RecentDocuments({ documentos }: RecentDocumentsProps) {
+  const { templates, isLoading } = useStore()
+
+  if (isLoading) return null
+
   const getTemplateName = (templateId: string) => {
-    const template = templatesIniciais.find(t => t.id === templateId)
+    const template = templates.find(t => t.id === templateId)
     return template?.nome_template || "Template desconhecido"
   }
 
@@ -64,13 +68,17 @@ export function RecentDocuments({ documentos }: RecentDocumentsProps) {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem>
-                    <Eye className="h-4 w-4 mr-2" />
-                    Visualizar
+                   <DropdownMenuItem asChild>
+                    <Link href={`/documentos/${doc.id}`}>
+                      <Eye className="h-4 w-4 mr-2" />
+                      Visualizar
+                    </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Download className="h-4 w-4 mr-2" />
-                    Baixar PDF
+                  <DropdownMenuItem asChild>
+                    <Link href={`/documentos/${doc.id}?print=true`}>
+                      <Download className="h-4 w-4 mr-2" />
+                      Baixar PDF
+                    </Link>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

@@ -23,7 +23,13 @@ import {
   Save,
 } from "lucide-react"
 
+import { toast } from "sonner"
+
 export default function ConfiguracoesPage() {
+  const handleSave = () => {
+    toast.success("Configurações salvas com sucesso!")
+  }
+
   return (
     <DashboardLayout
       title="Configurações"
@@ -56,7 +62,7 @@ export default function ConfiguracoesPage() {
               <Label htmlFor="empresa">Empresa/Instituição</Label>
               <Input id="empresa" defaultValue="Bonsae" />
             </div>
-            <Button>
+            <Button onClick={handleSave}>
               <Save className="h-4 w-4 mr-2" />
               Salvar Alterações
             </Button>

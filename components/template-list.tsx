@@ -19,13 +19,33 @@ interface TemplateListProps {
   compact?: boolean
 }
 
+import { useStore } from "@/components/store-provider"
+import { toast } from "sonner"
+
 export function TemplateList({ templates, compact = false }: TemplateListProps) {
+  const { deleteTemplate, addTemplate } = useStore()
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('pt-BR', {
       day: '2-digit',
       month: 'short',
       year: 'numeric',
     })
+  }
+
+  const handleDuplicate = (template: Template) => {
+    addTemplate({
+      ...template,
+      nome_template: `${template.nome_template} (Cópia)`,
+    })
+    toast.success("Template duplicado com sucesso!")
+  }
+
+  const handleDelete = (id: string) => {
+    if (confirm("Tem certeza que deseja excluir este template?")) {
+      deleteTemplate(id)
+      toast.success("Template excluído com sucesso!")
+    }
   }
 
   if (compact) {
@@ -98,12 +118,12 @@ export function TemplateList({ templates, compact = false }: TemplateListProps) 
                       Editar
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleDuplicate(template)}>
                     <Copy className="h-4 w-4 mr-2" />
                     Duplicar
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="text-destructive">
+                  <DropdownMenuItem className="text-destructive" onClick={() => handleDelete(template.id)}>
                     <Trash2 className="h-4 w-4 mr-2" />
                     Excluir
                   </DropdownMenuItem>

@@ -21,7 +21,8 @@ import {
 } from "@/components/ui/select"
 import { Save, Eye, FileDown, ArrowLeft, Play } from "lucide-react"
 import Link from "next/link"
-import { templatesIniciais } from "@/lib/store"
+import { useStore } from "@/components/store-provider"
+import { toast } from "sonner"
 import type { Template } from "@/lib/types"
 
 const categorias = [
@@ -36,6 +37,7 @@ const categorias = [
 export default function EditarTemplatePage() {
   const params = useParams()
   const router = useRouter()
+  const { templates, updateTemplate, isLoading } = useStore()
   const [template, setTemplate] = useState<Template | null>(null)
   const [nomeTemplate, setNomeTemplate] = useState("")
   const [categoria, setCategoria] = useState("")
@@ -45,8 +47,10 @@ export default function EditarTemplatePage() {
   const [isSaving, setIsSaving] = useState(false)
 
   useEffect(() => {
+    if (isLoading) return
+
     const templateId = params.id as string
-    const foundTemplate = templatesIniciais.find((t) => t.id === templateId)
+    const foundTemplate = templates.find((t) => t.id === templateId)
     if (foundTemplate) {
       setTemplate(foundTemplate)
       setNomeTemplate(foundTemplate.nome_template)
@@ -54,7 +58,7 @@ export default function EditarTemplatePage() {
       setConteudo(foundTemplate.conteudo)
       setLetterhead(foundTemplate.imagem_fundo || null)
     }
-  }, [params.id])
+  }, [params.id, templates, isLoading])
 
   const handleInsertVariable = (variavel: string) => {
     const selection = window.getSelection()
@@ -75,20 +79,34 @@ export default function EditarTemplatePage() {
   }
 
   const handleSave = async () => {
+    if (!template) return
     if (!nomeTemplate.trim()) {
-      alert("Por favor, informe o nome do template.")
+      toast.error("Por favor, informe o nome do template.")
       return
     }
     if (!conteudo.trim()) {
-      alert("Por favor, adicione conteúdo ao template.")
+      toast.error("Por favor, adicione conteúdo ao template.")
       return
     }
 
     setIsSaving(true)
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    setIsSaving(false)
-    router.push("/templates")
+    try {
+      updateTemplate(template.id, {
+        nome_template: nomeTemplate,
+        categoria: categoria,
+        conteudo: conteudo,
+        imagem_fundo: letterhead || undefined,
+      })
+      toast.success("Template atualizado com sucesso!")
+      router.push("/templates")
+    } catch (error) {
+      toast.error("Erro ao atualizar template.")
+    } finally {
+      setIsSaving(false)
+    }
   }
+
+  if (isLoading) return null
 
   if (!template) {
     return (
