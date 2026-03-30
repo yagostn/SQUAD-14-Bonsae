@@ -61,5 +61,4 @@ Um sistema web robusto desenvolvido com **Next.js** e **React** para criação, 
 - Sistema unificado de busca integrado ao cabeçalho.
 - Remoção completa de recursos nativos de geração em PDF, focando na integração orgânica em tela para flexibilidade do fluxo.
 
----
-*Desenvolvido pela equipe Bonsae*
+
