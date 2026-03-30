@@ -14,6 +14,55 @@ import { toast } from "sonner"
 import { extrairVariaveis, substituirVariaveis } from "@/lib/store"
 import type { Template } from "@/lib/types"
 
+// Função auxiliar para formatação
+const formatValue = (varName: string, value: string) => {
+  if (!value) return ""
+  
+  const nomeLower = varName.toLowerCase()
+  
+  if (nomeLower.includes('cpf')) {
+    return value
+      .replace(/\D/g, '')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d{1,2})/, '$1-$2')
+      .replace(/(-\d{2})\d+?$/, '$1')
+  }
+  
+  if (nomeLower.includes('rg')) {
+    return value
+      .replace(/\D/g, '')
+      .replace(/(\d{2})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d{1})/, '$1-$2')
+      .replace(/(-\d{1})\d+?$/, '$1') // RG formato: 12.345.678-9 (pode variar, mas tenta um padrão)
+  }
+  
+  if (nomeLower.includes('cep')) {
+    return value
+      .replace(/\D/g, '')
+      .replace(/(\d{5})(\d)/, '$1-$2')
+      .replace(/(-\d{3})\d+?$/, '$1')
+  }
+  
+  if (nomeLower.includes('telefone') || nomeLower.includes('celular')) {
+    return value
+      .replace(/\D/g, '')
+      .replace(/(\d{2})(\d)/, '($1) $2')
+      .replace(/(\d{4,5})(\d{4})$/, '$1-$2')
+  }
+
+  if (nomeLower.includes('data')) {
+    return value
+      .replace(/\D/g, '')
+      .replace(/(\d{2})(\d)/, '$1/$2')
+      .replace(/(\d{2})(\d)/, '$1/$2')
+      .replace(/(\d{4})\d+?$/, '$1')
+  }
+  
+  return value
+}
+
 export default function GerarDocumentoPage() {
   const params = useParams()
   const router = useRouter()
@@ -47,7 +96,8 @@ export default function GerarDocumentoPage() {
   }
 
   const handleInputChange = (varName: string, value: string) => {
-    setDados((prev) => ({ ...prev, [varName]: value }))
+    const formattedValue = formatValue(varName, value)
+    setDados((prev) => ({ ...prev, [varName]: formattedValue }))
   }
 
   const handleGeneratePDF = async () => {
@@ -141,7 +191,7 @@ export default function GerarDocumentoPage() {
           <p className="text-muted-foreground">Template não encontrado.</p>
           <Button className="mt-4" asChild>
             <Link href="/templates">
-              <ArrowLeft className="h-4 w-4 mr-2" />
+              <ArrowLeft className="h-4 w-4" />
               Voltar aos templates
             </Link>
           </Button>
@@ -160,17 +210,17 @@ export default function GerarDocumentoPage() {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <Button variant="ghost" asChild>
             <Link href="/templates">
-              <ArrowLeft className="h-4 w-4 mr-2" />
+              <ArrowLeft className="h-4 w-4" />
               Voltar
             </Link>
           </Button>
           <div className="flex gap-2">
             <Button variant="outline" onClick={handleGeneratePDF} disabled={isGenerating}>
-              <Printer className="h-4 w-4 mr-2" />
+              <Printer className="h-4 w-4" />
               Imprimir
             </Button>
             <Button onClick={handleGeneratePDF} disabled={isGenerating}>
-              <FileDown className="h-4 w-4 mr-2" />
+              <FileDown className="h-4 w-4" />
               {isGenerating ? "Gerando..." : "Exportar PDF"}
             </Button>
           </div>

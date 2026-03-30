@@ -101,7 +101,7 @@ export default function NovoTemplatePage() {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <Button variant="ghost" asChild>
             <Link href="/templates">
-              <ArrowLeft className="h-4 w-4 mr-2" />
+              <ArrowLeft className="h-4 w-4" />
               Voltar
             </Link>
           </Button>

@@ -25,14 +25,14 @@ export default function DashboardPage() {
         <div className="flex flex-wrap gap-3">
           <Button asChild>
             <Link href="/templates/novo">
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4" />
               Novo Template
             </Link>
           </Button>
           <Button variant="outline" asChild>
             <Link href="/templates">
               Ver Templates
-              <ArrowRight className="h-4 w-4 ml-2" />
+              <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
         </div>

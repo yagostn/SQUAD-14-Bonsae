@@ -219,13 +219,13 @@ export default function DocumentosPage() {
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem asChild>
                             <Link href={`/documentos/${doc.id}`}>
-                              <Eye className="h-4 w-4 mr-2" />
+                              <Eye className="h-4 w-4" />
                               Visualizar
                             </Link>
                           </DropdownMenuItem>
                           <DropdownMenuItem asChild>
                             <Link href={`/documentos/${doc.id}?print=true`}>
-                              <Download className="h-4 w-4 mr-2" />
+                              <Download className="h-4 w-4" />
                               Baixar PDF
                             </Link>
                           </DropdownMenuItem>

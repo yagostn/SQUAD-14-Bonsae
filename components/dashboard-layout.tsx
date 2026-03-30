@@ -10,9 +10,11 @@ interface DashboardLayoutProps {
   children: React.ReactNode
   title: string
   subtitle?: string
+  searchValue?: string
+  onSearchChange?: (value: string) => void
 }
 
-export function DashboardLayout({ children, title, subtitle }: DashboardLayoutProps) {
+export function DashboardLayout({ children, title, subtitle, searchValue, onSearchChange }: DashboardLayoutProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const pathname = usePathname()
 
@@ -37,6 +39,8 @@ export function DashboardLayout({ children, title, subtitle }: DashboardLayoutPr
           title={title} 
           subtitle={subtitle} 
           onMenuClick={() => setIsMobileMenuOpen(true)}
+          searchValue={searchValue}
+          onSearchChange={onSearchChange}
         />
         <main className="flex-1 overflow-y-auto p-4 md:p-6">
           {children}

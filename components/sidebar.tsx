@@ -9,7 +9,6 @@ import {
   FileText,
   FilePlus,
   FolderOpen,
-  Settings,
   Variable,
   Users,
   ChevronLeft,
@@ -44,23 +43,13 @@ const menuItems = [
     href: "/variaveis",
     icon: Variable,
   },
-  {
-    title: "Clientes",
-    href: "/clientes",
-    icon: Users,
-  },
-  {
-    title: "Configurações",
-    href: "/configuracoes",
-    icon: Settings,
-  },
 ]
 
 export function SidebarContent() {
   const pathname = usePathname()
 
   return (
-    <div className="flex flex-col h-full bg-sidebar">
+    <div className="flex flex-col h-full bg-sidebar rounded-r-2xl overflow-hidden">
       <div className="flex items-center justify-between p-4 border-b border-sidebar-border h-16 shrink-0">
         <Link href="/" className="flex items-center gap-2">
           <Image
@@ -68,7 +57,7 @@ export function SidebarContent() {
             alt="Bonsae"
             width={180}
             height={60}
-            className="h-12 w-auto brightness-0 invert"
+            className="h-12 w-auto brightness-0 invert ml-9 mb-2"
           />
         </Link>
       </div>
@@ -116,7 +105,7 @@ export function SidebarContent() {
 
 export function Sidebar() {
   return (
-    <aside className="hidden lg:flex flex-col h-screen w-64 border-r border-sidebar-border shrink-0">
+    <aside className="hidden lg:flex flex-col h-screen w-64 border-r border-sidebar-border shrink-0 rounded-r-4xl shadow-sm bg-sidebar">
       <SidebarContent />
     </aside>
   )

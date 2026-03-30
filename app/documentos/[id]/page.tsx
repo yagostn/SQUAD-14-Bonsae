@@ -55,7 +55,7 @@ export default function VisualizarDocumentoPage() {
           <p className="text-muted-foreground">O documento solicitado não foi encontrado.</p>
           <Button className="mt-4" asChild>
             <Link href="/documentos">
-              <ArrowLeft className="h-4 w-4 mr-2" />
+              <ArrowLeft className="h-4 w-4" />
               Voltar aos documentos
             </Link>
           </Button>
@@ -74,7 +74,7 @@ export default function VisualizarDocumentoPage() {
         <div className="flex flex-wrap items-center justify-between gap-4 no-print">
           <Button variant="ghost" asChild>
             <Link href="/documentos">
-              <ArrowLeft className="h-4 w-4 mr-2" />
+              <ArrowLeft className="h-4 w-4" />
               Voltar
             </Link>
           </Button>

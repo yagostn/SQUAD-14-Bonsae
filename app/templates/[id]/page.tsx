@@ -115,7 +115,7 @@ export default function EditarTemplatePage() {
           <p className="text-muted-foreground">Template não encontrado.</p>
           <Button className="mt-4" asChild>
             <Link href="/templates">
-              <ArrowLeft className="h-4 w-4 mr-2" />
+              <ArrowLeft className="h-4 w-4" />
               Voltar aos templates
             </Link>
           </Button>
@@ -134,23 +134,23 @@ export default function EditarTemplatePage() {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <Button variant="ghost" asChild>
             <Link href="/templates">
-              <ArrowLeft className="h-4 w-4 mr-2" />
+              <ArrowLeft className="h-4 w-4" />
               Voltar
             </Link>
           </Button>
           <div className="flex gap-2">
             <Button variant="outline" asChild>
               <Link href={`/templates/${template.id}/gerar`}>
-                <Play className="h-4 w-4 mr-2" />
+                <Play className="h-4 w-4" />
                 Gerar Documento
               </Link>
             </Button>
             <Button variant="outline" onClick={() => setActiveTab("preview")}>
-              <Eye className="h-4 w-4 mr-2" />
+              <Eye className="h-4 w-4" />
               Visualizar
             </Button>
             <Button onClick={handleSave} disabled={isSaving}>
-              <Save className="h-4 w-4 mr-2" />
+              <Save className="h-4 w-4" />
               {isSaving ? "Salvando..." : "Salvar"}
             </Button>
           </div>

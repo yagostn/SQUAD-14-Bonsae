@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useCallback } from "react"
+import { useRef, useCallback, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import {
   Bold,
@@ -37,6 +37,12 @@ export function RichTextEditor({
   className,
 }: RichTextEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (editorRef.current && editorRef.current.innerHTML !== value) {
+      editorRef.current.innerHTML = value
+    }
+  }, [value])
 
   const execCommand = useCallback((command: string, value?: string) => {
     document.execCommand(command, false, value)
@@ -130,11 +136,11 @@ export function RichTextEditor({
         ref={editorRef}
         contentEditable
         suppressContentEditableWarning
-        className="min-h-[400px] p-4 outline-none prose prose-sm max-w-none focus:ring-2 focus:ring-ring focus:ring-inset"
+        className="min-h-[400px] p-4 outline-none prose prose-sm max-w-none focus:ring-2 focus:ring-ring focus:ring-inset break-words whitespace-pre-wrap"
         onInput={handleInput}
         onPaste={handlePaste}
-        dangerouslySetInnerHTML={{ __html: value }}
         data-placeholder={placeholder}
+        dir="ltr"
         style={{
           minHeight: "400px",
         }}

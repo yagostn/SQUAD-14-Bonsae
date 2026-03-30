@@ -40,23 +40,16 @@ export default function TemplatesPage() {
     <DashboardLayout
       title="Templates"
       subtitle="Gerencie seus modelos de documentos"
+      searchValue={searchQuery}
+      onSearchChange={setSearchQuery}
     >
       <div className="space-y-6">
         {/* Header Actions */}
         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
           <div className="flex flex-1 gap-3 w-full sm:w-auto">
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Buscar templates..."
-                className="pl-9"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
             <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="w-[180px]">
-                <Filter className="h-4 w-4 mr-2" />
+              <SelectTrigger className="w-[190px]">
+                <Filter className="h-4 w-4" />
                 <SelectValue placeholder="Categoria" />
               </SelectTrigger>
               <SelectContent>
@@ -71,7 +64,7 @@ export default function TemplatesPage() {
           </div>
           <Button asChild>
             <Link href="/templates/novo">
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4" />
               Novo Template
             </Link>
           </Button>
